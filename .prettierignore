@@ -1,0 +1,11 @@
+.next
+.husky
+.github
+public
+.dockerignore
+.env
+.eslint*
+docker-compose*
+next.config*
+streams
+.npmrc

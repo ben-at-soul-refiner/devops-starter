@@ -1,0 +1,56 @@
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "autocomplete_filter": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 20
+        }
+      },
+      "analyzer": {
+        "autocomplete": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "autocomplete_filter"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "book": {
+        "type": "flattened"
+      },
+      "chapter_number": {
+        "type": "integer"
+      },
+      "verse_number": {
+        "type": "integer"
+      },
+      "content": {
+        "type": "text"
+      },
+      "character_count": {
+        "type": "integer",
+        "index": false
+      },
+      "word_count": {
+        "type": "integer",
+        "index": false
+      },
+      "referenced_locations": {
+        "type": "geo_point"
+      },
+      "location_names": {
+        "type": "keyword"
+      },
+      "speakers": {
+        "type": "keyword"
+      }
+    }
+  }
+}

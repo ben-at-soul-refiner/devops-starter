@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# ensure the status of the cluster
+
+es_connection=false;
+
+URI="es:9200/_cat/health?h=status";
+health=$(curl -s -H 'content-type: application/json' ${URI});
+health="$(echo "$health" | sed -r 's/^[[:space:]]+|[[:space:]]+$//g')";
+
+until [ "$health" = 'green' ]; do
+  health=$(curl -s -H 'content-type: application/json' ${URI});
+  health="$(echo "$health" | sed -r 's/^[[:space:]]+|[[:space:]]+$//g')";
+
+  if [ "$health" = 'yellow' ]; then
+    echo "DB-Sync established connection with a YELLOW elastic search cluster";
+    break;
+  fi
+
+  echo "DB-Sync is attempting to establish connection with elastic search";
+
+  sleep 2
+done;
+
+# add the bible datastreams if not already there
+
+for filepath in src/streams/*.json; do
+  [ -e "$filepath" ] || continue
+  filename=${filepath#src/streams/};
+  index=${filename%_stream.json};
+
+  status=$(curl -s -o /dev/null -I -w "%{http_code}" "es:9200/${index}");
+
+  if [ $status != 200 ]; then
+    mapping=$(curl -s -H 'content-type: application/json' -XPUT --data-binary @src/mappings/bible.json "es:9200/${index}?pretty");
+    stream_response=$(curl -s -H 'content-type: application/json' -XPUT --data-binary @${filepath} "es:9200/_bulk?pretty");
+    echo "Elasticsearch created index ${index}";
+  else 
+    echo "Elasticsearch has already indexed ${index}";
+  fi
+done;
+
+yarn dev;

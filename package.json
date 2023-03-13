@@ -2,7 +2,7 @@
   "name": "devops-starter",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "SEE LICENSE IN ./license.md",
+  "license": "CC-BY-3.0-US",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.54.1",
     "@typescript-eslint/parser": "^5.54.1",
@@ -13,6 +13,8 @@
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "prepare": "husky install"
+    "format": "prettier --write .",
+    "prepare": "husky install",
+    "lint": "yarn eslint ./**/*.{ts,tsx}"
   }
 }

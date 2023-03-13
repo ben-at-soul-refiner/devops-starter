@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  elasticsearch: 
+    container_name: es
+    hostname: es
+    image: elasticsearch:8.6.2
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    environment:
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - discovery.type=single-node
+      - logger.level=ERROR
+      - xpack.security.enabled=false
+      - ingest.geoip.downloader.enabled=false
+  backend: 
+    depends_on:
+      - elasticsearch
+    container_name: devops-starter-backend
+    hostname: backend
+    build: 
+      context: .
+      dockerfile: ./docker/Dockerfile.backend.dev
+    volumes:
+      - ./backend:/app
+  frontend: 
+    container_name: devops-starter-frontend
+    hostname: frontend
+    build: 
+      context: .
+      dockerfile: ./docker/Dockerfile.frontend.dev
+    volumes:
+      - ./frontend:/app
+    ports:
+      - '3000:3000'
+  nginx: 
+    container_name: devops-starter-nginx
+    depends_on:
+      - frontend
+      - backend
+    build: 
+      context: .
+      dockerfile: ./docker/Dockerfile.gateway.dev
+    image: nginx:alpine
+    ports: 
+      - '80:80'
+      - '443:443'
+volumes:
+  esdata:
